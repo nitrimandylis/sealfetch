@@ -1,4 +1,4 @@
-# wallpaper
+# sealfetch
 
 Matching Mac and iPhone wallpapers that know they are wallpapers.
 
@@ -57,7 +57,7 @@ Outputs: `mac-4096x2304` (UltraGear), `mac-3024x1964` (built-in),
 
 ## Open
 
-- Not yet published. Pick a winning variant first.
-- No LICENSE or README yet; both are required before `publish-repo` will run.
+- Published public at github.com/nitrimandylis/sealfetch (2026-07-27) with both
+  variants. No winner picked; both stay until one is boring.
 - The seal's body outline runs off the bottom edge because the source art is
   cropped there. Reads as a bust, but it is not a deliberate choice.
