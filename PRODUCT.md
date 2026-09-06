@@ -1,63 +1,79 @@
 # sealfetch
 
-Matching Mac and iPhone wallpapers that know they are wallpapers.
+The seal. One drawing, every asset that derives from it, and the rule that
+nothing else holds a competing version.
 
-The avatar (`seal.svg`) is the logo, rasterised to a 60x57 dot grid. The palette
-is lifted from the year-progress wallpaper that started this: `#1a1a1a`
-background, `#4d4d4d` seal, `#888` keys, `#fff` values, `#f56b3f` accent.
-Type is Cascadia Code NF, the terminal font, with Nerd Font glyphs in the keys.
+## The rule
 
-## Two variants, one idea
+- `seal/og.png` is the illustration: a seal in glasses holding coffee, 2048px,
+  the GitHub avatar. It is the identity. Future designs start from it.
+- `seal/seal.svg` is the trace: `currentColor` line art with a faint tone layer.
+  Every generated asset is this trace at a colour. It was traced from the 460px
+  avatar download (`seal/avatar-460.png`) by pitch's pipeline and is **frozen**
+  by decision on 2026-09-06: tracing the 2048px original gives visibly better
+  whiskers, freckles and zipper teeth, and it was rejected in favour of keeping
+  the mark that already ships in pitch and fastfetch.
+- `trace/` holds that pipeline, unchanged from pitch, for future designs only.
+  Running it on `og.png` today would produce a different trace; do not.
+- `variants.toml` is the colour table. A variant is a named `bg` + `fg` pair on
+  the trace. Adding one is one entry. There is no project-to-variant map; a
+  consumer picks a variant by URL and that is the record.
+- The 🦭 emoji belongs to the GitHub profile page only. No README carries the
+  seal in any form, emoji or mark, and there is no "built by" colophon.
 
-Both report on the wallpaper's own working conditions, in the register of a
-resigned employee. They are competing for the job.
+## Outputs
 
-- **fetch** — neofetch-style output, seal left, `key -> value` right. Accent on
-  the hostname, the mug, and the cursor.
-- **json** — the same facts as `wallpaper.json` in an editor, with a line-number
-  gutter. The whole seal is the `"avatar"` array. Accent on the mug, `null`,
-  bare numbers, and the cursor.
+| path | what | consumer |
+|---|---|---|
+| `out/avatar/sigil.{svg,png}` | cream on Claude terracotta, 512px | SIGIL, the automation persona, as Discord webhook avatar via the raw GitHub URL |
+| `out/avatar/sigil-dark.*` | terracotta on near-black | SIGIL on dark surfaces |
+| `out/avatar/terminal.*` | orange on `#1a1a1a` | the seal in the wallpaper palette |
+| `out/avatar/mono.svg` | the bare trace, transparent, `currentColor` | pitch pastes it inline |
+| `out/wallpaper/{fetch,json}-*.png` | six wallpapers, two designs, three screens | swatch's `seal` theme carries the four Mac ones |
 
-## Build
+`out/avatar/` is a URL other things point at. Do not rename files in it.
 
-```
-bun wallpaper.ts           # six PNGs into out/
-bun wallpaper.ts --check   # self-check, no rendering
-```
+## Copies, by convention
 
-Needs `rsvg-convert` (`brew install librsvg`) and Cascadia Code NF installed.
+The repo is source of truth but published repos keep no local clone, so
+consumers hold copies. The trace is frozen, so a copy cannot drift. If it is
+ever retraced, update these by hand:
 
-Outputs: `mac-4096x2304` (UltraGear), `mac-3024x1964` (built-in),
-`iphone-1170x2532`, each in both variants.
+- `~/.config/fastfetch/seal.svg`, recoloured per swatch theme at fetch time by
+  `update-logo.sh`.
+- `pitch/assets/seal.svg`, pasted inline into every pitch page.
+- `~/.config/swatch/themes/seal/wallpapers/`, the four Mac wallpapers.
 
-## Decisions worth not re-deriving
+The `ff` alias passes `--logo none` outside Ghostty: T3 Code's terminal is
+xterm.js and drops kitty graphics, leaving a blank column.
 
-- **60 columns is the floor for the seal.** `seal.svg` is outline art, not a
-  silhouette, so it has no low-frequency mass to fall back on. Below ~48
-  columns the glasses and mug stop reading. Flood-filling it into a silhouette
-  does not work: the drawing is cropped by its own canvas on three sides, so
-  there is no enclosed region to fill.
-- **Dots nearly fill their cell** (0.86 of pitch). Thin dots turned the seal
-  into a ghost at wallpaper scale.
+## Wallpaper decisions worth not re-deriving
+
+- **Both designs stay.** `fetch` (neofetch layout) and `json` (source file in an
+  editor) were built to compete; no winner was picked and none will be.
+- **The seal runs off the bottom edge** because the illustration is cropped
+  there. It reads as a bust. Closed: by nature of the drawing.
+- **60 columns is the floor for the dot grid.** The trace is outline art, so
+  below ~48 columns the glasses and mug stop reading. Flood-filling to a
+  silhouette fails: the drawing is cropped on three sides, no enclosed region.
+- **Dots nearly fill their cell** (0.86 of pitch). Thin dots ghost the seal.
 - **The JSON variant needs its own grid.** A character cell is 0.586 wide and
-  1.6 tall, so the dot grid rendered as text comes out ~2.7x stretched: only the
-  head fits and it looks cut off. `SEAL_TEXT_40` / `SEAL_TEXT_48` are rasterised
-  at the cell's real aspect and encoded with half blocks (`▀▄█`), which doubles
-  vertical resolution. The whole seal then lands in 14 or 17 lines and no fold
-  is needed.
-- **Two text widths.** 48 columns puts the JSON block at 59 columns; on a 1170px
-  phone that is 26px type. The phone gets 40.
-- **The last avatar row drops its trailing comma.** It is pretending to be a
-  real file.
-- **`ADVANCE = 0.586`** was measured by rendering a known string and reading
-  pixel offsets. Every horizontal measurement derives from it. Remeasure if the
-  font changes.
-- The seal grid is baked into `seal-grid.ts` rather than rasterised at run time.
-  The drawing never changes.
+  1.6 tall, so the dot grid as text is ~2.7x stretched. `SEAL_TEXT_40` /
+  `SEAL_TEXT_48` are rasterised at the cell's real aspect with half blocks.
+- **Two text widths.** 48 columns for the Mac, 40 for the 1170px phone.
+- **`ADVANCE = 0.586`** was measured for Cascadia Code NF by rendering a known
+  string. Every horizontal measurement derives from it.
+- `seal-grid.ts` is baked from the trace, not rasterised at run time.
 
-## Open
+## Palette
 
-- Published public at github.com/nitrimandylis/sealfetch (2026-07-27) with both
-  variants. No winner picked; both stay until one is boring.
-- The seal's body outline runs off the bottom edge because the source art is
-  cropped there. Reads as a bust, but it is not a deliberate choice.
+`#1a1a1a` background, `#4d4d4d` seal, `#888` keys, `#fff` values, `#f56b3f`
+accent. Lifted from the year-progress wallpaper that started this. swatch's
+`seal` theme is hand-typed from these constants.
+
+## History
+
+- 2026-07-27: built as `wallpaper`, renamed and published as `sealfetch`, MIT.
+- 2026-09-06: restructured into the seal's source of truth. Avatar variants,
+  pitch's tracing pipeline, and the 2048px original moved in. MIT covers the
+  artwork too, by decision.

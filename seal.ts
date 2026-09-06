@@ -1,10 +1,12 @@
-// Builds two wallpapers that know they are wallpapers, at three screen sizes.
+// Renders everything derived from the seal.
 //
-//   variant A "fetch"  - neofetch-style output, seal as the logo
-//   variant B "json"   - the same facts as a source file in an editor
+//   out/avatar/<variant>.{svg,png}   the trace in each colour pair from variants.toml
+//   out/wallpaper/*.png              two wallpapers that know they are wallpapers
+//     "fetch"  - neofetch-style output, seal as the logo
+//     "json"   - the same facts as a source file in an editor
 //
-// Each variant is laid out as an SVG string and handed to rsvg-convert.
-// Run: bun wallpaper.ts        Self-check: bun wallpaper.ts --check
+// Everything is laid out as an SVG string and handed to rsvg-convert.
+// Run: bun seal.ts        Self-check: bun seal.ts --check
 
 import {
   SEAL,
@@ -16,6 +18,7 @@ import {
   TEXT_MUG_40,
   TEXT_MUG_48,
 } from "./seal-grid";
+import VARIANTS from "./variants.toml";
 
 // ---------------------------------------------------------------- constants
 
@@ -315,14 +318,42 @@ function renderJson(w: number, h: number, phone: boolean): string {
   return document_(w, h, parts.join(""));
 }
 
+// ---------------------------------------------------------------- avatars
+
+const AVATAR = 512;
+const TRACE = { w: 427, h: 406 }; // seal/seal.svg's viewBox
+
+type Variant = { bg?: string; fg: string; use: string };
+
+// The trace, scaled to 380 of the 512 box and centred. With a background it is
+// a square avatar; without one it is the bare mark on a transparent square.
+function avatarSvg(v: Variant, inner: string): string {
+  const scale = 380 / TRACE.w;
+  const x = (AVATAR - TRACE.w * scale) / 2;
+  const y = (AVATAR - TRACE.h * scale) / 2;
+  const rect = v.bg ? `<rect width="${AVATAR}" height="${AVATAR}" fill="${v.bg}"/>` : "";
+  return (
+    `<svg xmlns="http://www.w3.org/2000/svg" width="${AVATAR}" height="${AVATAR}" ` +
+    `viewBox="0 0 ${AVATAR} ${AVATAR}" role="img" aria-label="seal">${rect}` +
+    `<g transform="translate(${x.toFixed(1)},${y.toFixed(1)}) scale(${scale.toFixed(4)})" ` +
+    `fill="${v.fg}">${inner}</g></svg>\n`
+  );
+}
+
+// The paths inside seal/seal.svg, without its <svg> wrapper.
+async function traceInner(): Promise<string> {
+  const svg = await Bun.file("seal/seal.svg").text();
+  return svg.replace(/^<svg[^>]*>/, "").replace(/<\/svg>\s*$/, "");
+}
+
 // ---------------------------------------------------------------- driver
 
-async function render(svg: string, out: string) {
-  const tmp = `${out}.svg`;
+async function render(svg: string, out: string, keepSvg = false) {
+  const tmp = keepSvg ? out.replace(/\.png$/, ".svg") : `${out}.svg`;
   await Bun.write(tmp, svg);
   const p = Bun.spawn(["rsvg-convert", tmp, "-o", out]);
   if ((await p.exited) !== 0) throw new Error(`rsvg-convert failed for ${out}`);
-  await Bun.file(tmp).delete();
+  if (!keepSvg) await Bun.file(tmp).delete();
 }
 
 function check() {
@@ -357,15 +388,28 @@ function check() {
     throw new Error("unescaped ampersand in output");
   if (!svg.includes(C.accent)) throw new Error("accent colour never used");
 
-  console.log(`ok: ${lit} dots, ${mugDots} in the mug, svg ${svg.length} bytes`);
+  const av = avatarSvg({ bg: "#123456", fg: "#abcdef", use: "" }, "<path d=\"M0,0\"/>");
+  if (!av.includes('fill="#123456"') || !av.includes('fill="#abcdef"'))
+    throw new Error("avatar lost a colour");
+  if (avatarSvg({ fg: "currentColor", use: "" }, "").includes("<rect"))
+    throw new Error("mono avatar must have no background");
+  const names = Object.keys(VARIANTS as Record<string, Variant>);
+  if (!names.includes("sigil")) throw new Error("variants.toml lost sigil");
+
+  console.log(`ok: ${lit} dots, ${mugDots} in the mug, ${names.length} variants, svg ${svg.length} bytes`);
 }
 
 if (Bun.argv.includes("--check")) {
   check();
 } else {
+  const inner = await traceInner();
+  for (const [name, v] of Object.entries(VARIANTS as Record<string, Variant>)) {
+    await render(avatarSvg(v, inner), `out/avatar/${name}.png`, true);
+    console.log(`avatar/${name}`);
+  }
   for (const t of TARGETS) {
-    await render(renderFetch(t.w, t.h, t.phone), `out/fetch-${t.name}.png`);
-    await render(renderJson(t.w, t.h, t.phone), `out/json-${t.name}.png`);
-    console.log(`${t.name}  fetch + json`);
+    await render(renderFetch(t.w, t.h, t.phone), `out/wallpaper/fetch-${t.name}.png`);
+    await render(renderJson(t.w, t.h, t.phone), `out/wallpaper/json-${t.name}.png`);
+    console.log(`wallpaper/${t.name}  fetch + json`);
   }
 }

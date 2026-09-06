@@ -1,0 +1,24 @@
+# Every entry is the frozen trace (seal/seal.svg) in one colour pair, rendered
+# to out/avatar/<name>.svg and .png at 512. `og` is the illustration itself and
+# is not rendered, it is copied.
+#
+# The colours are named for what they are used as, not where they came from.
+
+[sigil]
+bg = "#D97757"   # Claude terracotta, on purpose
+fg = "#F5D9CB"
+use = "SIGIL, the automation persona: Discord webhook avatar"
+
+[sigil-dark]
+bg = "#0D0D10"
+fg = "#D97757"
+use = "SIGIL on dark surfaces"
+
+[terminal]
+bg = "#1a1a1a"   # the wallpaper palette
+fg = "#f56b3f"
+use = "the seal in its own colours"
+
+[mono]
+fg = "currentColor"
+use = "the bare trace, pasted inline wherever page colour should win (pitch)"

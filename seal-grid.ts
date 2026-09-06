@@ -1,7 +1,7 @@
 // The avatar, rasterised once to a 60x57 dot grid. Baked rather than computed
 // at run time because the drawing never changes.
 //
-// ponytail: regenerate with `bun tools/rasterize.ts` only if seal.svg changes.
+// ponytail: regenerate with `bun tools/rasterize.ts` only if seal/seal.svg changes.
 // 60 columns is the measured floor: below ~48 the glasses and the mug stop
 // reading and the seal turns into noise.
 
