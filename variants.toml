@@ -7,12 +7,12 @@
 [sigil]
 bg = "#D97757"   # Claude terracotta, on purpose
 fg = "#F5D9CB"
-use = "SIGIL Discord server icon"
+use = "SIGIL on light surfaces"
 
 [sigil-dark]
 bg = "#0D0D10"
 fg = "#D97757"
-use = "siren webhook avatar in #alerts, and SIGIL on dark surfaces"
+use = "SIGIL Discord server icon"
 
 [terminal]
 bg = "#1a1a1a"   # the wallpaper palette
