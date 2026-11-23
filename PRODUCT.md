@@ -40,7 +40,7 @@ taken off. They never replace the illustration or the trace.
 
 - `christmas-2026.png`: Santa hat, Fair Isle band, hot chocolate, 1024px. Made
   2026-11-23 with FLUX 3 Image Klein (local, 6-bit) plus a composite step that keeps
-  77% of the pixels byte-identical to the original; only the new items are generated.
+  83% of the pixels byte-identical to the original; only the new items are generated.
   Profile pictures only, until 7 January 2027.
 
 ## Copies, by convention
