@@ -33,6 +33,16 @@ nothing else holds a competing version.
 
 `out/avatar/` is a URL other things point at. Do not rename files in it.
 
+## Seasonal
+
+`seal/seasonal/` holds dated costume versions of `og.png`, worn for a while and then
+taken off. They never replace the illustration or the trace.
+
+- `christmas-2026.png`: Santa hat, Fair Isle band, hot chocolate, 1024px. Made
+  2026-11-23 with FLUX 3 Image Klein (local, 6-bit) plus a composite step that keeps
+  77% of the pixels byte-identical to the original; only the new items are generated.
+  Profile pictures only, until 7 January 2027.
+
 ## Copies, by convention
 
 The repo is source of truth but published repos keep no local clone, so
@@ -77,3 +87,4 @@ accent. Lifted from the year-progress wallpaper that started this. swatch's
 - 2026-09-06: restructured into the seal's source of truth. Avatar variants,
   pitch's tracing pipeline, and the 2048px original moved in. MIT covers the
   artwork too, by decision.
+- 2026-11-23: first seasonal costume, `seal/seasonal/christmas-2026.png`.
